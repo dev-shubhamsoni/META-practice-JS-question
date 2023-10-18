@@ -2,125 +2,103 @@ const leftContainer = document.getElementById('left-container');
 const rightContainer = document.getElementById('right-container');
 
 const inputArea = document.getElementById('input-area');
-const inputAddLeft = document.getElementById('input-add-left');
-const inputAddRight = document.getElementById('input-add-right');
+const inputAddLeft = document.getElementById('input-add-left-container');
+const inputAddRight = document.getElementById('input-add-right-container');
 
-const moveLeftToRight = document.getElementById('left-right')
-const moveRightToLeft = document.getElementById('right-left')
+const moveLeftToRight = document.getElementById('left-right');
+const moveRightToLeft = document.getElementById('right-left');
+
+
+
+
 // Global Variables
-let globalArray = [];
-let leftContainerArray = [];
-let rightContainerArray = [];
 
-let checkboxArray = [];
+let inputAreaData = [];
 
-let checkboxDivCount = 0;
+let leftContainerData = {};
+let leftContainerCheckboxes = {};
+let leftContainercounter = 0;
+
+let rightContainerData = {};
+let rightContainerCheckboxes = {};
+let rightContainercounter = 0;
 
 
+// checks
 
-// all Functions
-function addingToArray(event) {
-    globalArray.push(event.target.value);
+
+// Functions
+
+function inputFieldData(event) {
+    const inputData = event.target.value;
+    inputAreaData.push(inputData)
+    console.log(inputAreaData);
+    inputArea.value = '';
 }
 
-function addItemsToContainer(container, bothContainerArray, render) {
+function creatingDivAndAddingToObject(container) {
     const div = document.createElement('div');
-    div.className = 'div-text-checkbox';
-    div.id = `div-${checkboxDivCount}`;
+    div.className = 'overallDiv';
+    div.id = 'overallDiv';
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
-    checkbox.id = checkboxDivCount;
-    
-    checkboxDivCount++;
-
-    const text = document.createElement('h2');
-    text.className = 'text';
-    text.textContent = globalArray[0];
-
+    checkbox.className = 'checkboxx';
+    // checkboxes.push(checkbox);
     div.appendChild(checkbox);
-    div.appendChild(text);
-    bothContainerArray.push(div)
-    render(container)
-    
 
-    globalArray = [];
-    inputArea.value = '';
+    const heading2 = document.createElement('h2');
+    heading2.className = 'heading2';
+    heading2.textContent = inputAreaData[0];
+    div.appendChild(heading2);
 
-    console.log(div.id);
-}
-
-
-function renderLeft(container) {
-    
-    leftContainerArray.forEach((item) => {
-        container.appendChild(item);
-            // console.log(container);
-    })
-
-
-}
-
-function renderRight(container) {
-    rightContainerArray.forEach((item) => {
-        container.appendChild(item);
-    })
-
-    
-
-}
-
-function movingItems() {
-    
-    for (let i = 0; i < checkboxArray.length; i++) {
-        
-        let divId = document.getElementById(`div-${checkboxArray[i]}`);
-        divId.remove();
-        rightContainerArray.push(divId)
-        renderRight(rightContainer)
-
-        
-        const indexxxx = leftContainerArray.indexOf(checkboxArray[i]);
-        const finalLeftContainerArray = leftContainerArray.splice(indexxxx, 1);
-        leftContainerArray = finalLeftContainerArray;
+    if (container === leftContainer) {
+        leftContainerData[leftContainercounter] = div;
+        leftContainerCheckboxes[leftContainercounter] = checkbox;
+        leftContainercounter++
+    } else {
+        rightContainerData[rightContainercounter] = div;
+        rightContainerCheckboxes[leftContainercounter] = checkbox;
+        rightContainercounter++
     }
-    
-    checkboxArray = [];
-    console.log(checkboxArray);    
+
+    inputAreaData = [];
+
+    console.log('left container data: ', leftContainerData);
+    console.log('right container data: ', rightContainerData);
+
+    console.log('left container checkbox: ', leftContainerCheckboxes);
+    console.log('right container checkbox: ', rightContainerCheckboxes);
+
+    renderDataLeftOrRight(container)
+    // console.log(checkboxes);
 }
 
-// all Event Listeners
-inputArea.addEventListener('change', addingToArray);
+function renderDataLeftOrRight(container) {
 
-inputAddLeft.addEventListener('click', () => addItemsToContainer(leftContainer, leftContainerArray, renderLeft));
-inputAddRight.addEventListener('click', () => addItemsToContainer(rightContainer, rightContainerArray, renderRight));
+    if (container === leftContainer) {
+        for (const key in leftContainerData) {
+            container.appendChild(leftContainerData[key]);
+            
 
-document.addEventListener('change', (event) => {
-    if (event.target.checked) {
-        checkboxArray.push(event.target.id)
-        console.log(event.target.id, event.target.checked);
-        console.log(checkboxArray);
-
-
-    }
-    else if (!event.target.checked) {
-        const index = checkboxArray.indexOf(event.target.id);
-        if (index !== -1) {
-            checkboxArray.splice(index, 1);
-            console.log(checkboxArray);
+        }
+    } else {
+        for (const key in rightContainerData) {
+            container.appendChild(rightContainerData[key]);
         }
     }
+}
+
+// all event lsiteners
+
+inputArea.addEventListener('change', inputFieldData);
+
+inputAddLeft.addEventListener('click', () => {
+    creatingDivAndAddingToObject(leftContainer);
 });
 
+inputAddRight.addEventListener('click', () => {
+    creatingDivAndAddingToObject(rightContainer);
+});
 
-
-
-moveLeftToRight.addEventListener('click', movingItems)
-moveRightToLeft.addEventListener('click', movingItems)
-
-moveRightToLeft.addEventListener('click', () => {
-    console.log(leftContainerArray);
-
-    console.log(rightContainerArray);
-})
 

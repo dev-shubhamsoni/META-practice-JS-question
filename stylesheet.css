@@ -52,7 +52,15 @@ body {
 
 /* div-text-checkbox */
 
-.div-text-checkbox{
+.overallDiv{
   display: flex;
   margin-bottom: -20px;
+}
+
+.heading2{
+  padding-left: 20px;
+}
+
+.overallDiv{
+  margin-bottom: -30px;
 }
