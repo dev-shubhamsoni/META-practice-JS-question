@@ -16,12 +16,16 @@ const moveRightToLeft = document.getElementById('right-left');
 let inputAreaData = [];
 
 let leftContainerData = {};
-let leftContainerCheckboxes = {};
-let leftContainercounter = 0;
+// let leftContainerCheckboxes = [];
+// let leftContainercounter = 0;
 
 let rightContainerData = {};
-let rightContainerCheckboxes = {};
-let rightContainercounter = 0;
+
+let checkboxArray = [];
+// let rightContainercounter = 0;
+
+let idCounter = 0;
+
 
 
 // checks
@@ -29,21 +33,24 @@ let rightContainercounter = 0;
 
 // Functions
 
+
 function inputFieldData(event) {
     const inputData = event.target.value;
     inputAreaData.push(inputData)
     console.log(inputAreaData);
+
     inputArea.value = '';
 }
 
-function creatingDivAndAddingToObject(container) {
+function creatingDivAndAddingToObject(container, data) {
     const div = document.createElement('div');
     div.className = 'overallDiv';
-    div.id = 'overallDiv';
+    div.id = `divID${idCounter}`;
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.className = 'checkboxx';
+    checkbox.id = idCounter;
     // checkboxes.push(checkbox);
     div.appendChild(checkbox);
 
@@ -53,13 +60,13 @@ function creatingDivAndAddingToObject(container) {
     div.appendChild(heading2);
 
     if (container === leftContainer) {
-        leftContainerData[leftContainercounter] = div;
-        leftContainerCheckboxes[leftContainercounter] = checkbox;
-        leftContainercounter++
+        leftContainerData[idCounter] = div;
+        // leftContainercounter++
+        idCounter++
     } else {
-        rightContainerData[rightContainercounter] = div;
-        rightContainerCheckboxes[leftContainercounter] = checkbox;
-        rightContainercounter++
+        rightContainerData[idCounter] = div;
+        // rightContainercounter++
+        idCounter++
     }
 
     inputAreaData = [];
@@ -67,38 +74,110 @@ function creatingDivAndAddingToObject(container) {
     console.log('left container data: ', leftContainerData);
     console.log('right container data: ', rightContainerData);
 
-    console.log('left container checkbox: ', leftContainerCheckboxes);
-    console.log('right container checkbox: ', rightContainerCheckboxes);
-
-    renderDataLeftOrRight(container)
-    // console.log(checkboxes);
+    renderDataLeftOrRight(container, data)
 }
 
-function renderDataLeftOrRight(container) {
+function renderDataLeftOrRight(container, data) {
+
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
 
     if (container === leftContainer) {
         for (const key in leftContainerData) {
-            container.appendChild(leftContainerData[key]);
-            
+            container.appendChild(data[key]);
+            const checkbox = leftContainerData[key].querySelector('.checkboxx');
+            checkbox.checked = false;
+            checkboxArray = [];
 
         }
+
     } else {
         for (const key in rightContainerData) {
-            container.appendChild(rightContainerData[key]);
+            container.appendChild(data[key]);
+            const checkbox = rightContainerData[key].querySelector('.checkboxx');
+            checkbox.checked = false;
+            checkboxArray = [];
         }
     }
+}
+
+function movingLeftToRight() {
+    for (let i = 0; i < checkboxArray.length; i++) {
+        console.log(checkboxArray[i]);
+
+        let keyToRemove = checkboxArray[i]
+        let valueToMove = leftContainerData[keyToRemove]
+        rightContainerData[keyToRemove] = valueToMove;
+        delete leftContainerData[keyToRemove];
+
+    }
+    console.log('left container data after moving: ', leftContainerData);
+    console.log('right container data after moving: ', rightContainerData);
+    renderDataLeftOrRight(leftContainer, leftContainerData);
+    renderDataLeftOrRight(rightContainer, rightContainerData);
+
+}
+
+function movingRightToLeft() {
+    for (let i = 0; i < checkboxArray.length; i++) {
+        console.log(checkboxArray[i]);
+        let keyToRemove = checkboxArray[i]
+        let valueToMove = rightContainerData[keyToRemove]
+
+        leftContainerData[keyToRemove] = valueToMove;
+
+        delete rightContainerData[keyToRemove];
+        // console.log(rightContainerData);
+    }
+    console.log('left container data after moving: ', leftContainerData);
+    console.log('right container data after moving: ', rightContainerData);
+    renderDataLeftOrRight(leftContainer, leftContainerData);
+    renderDataLeftOrRight(rightContainer, rightContainerData);
+}
+
+
+function checkboxCheckOrNot(event) {
+    if (event.target.checked) {
+        checkboxArray.push(event.target.id)
+        console.log(event.target.id, event.target.checked);
+        console.log(checkboxArray);
+    } else if (!event.target.checked) {
+        const index = checkboxArray.indexOf(event.target.id);
+        if (index !== -1) {
+            checkboxArray.splice(index, 1);
+            console.log(checkboxArray);
+        }
+    }
+
 }
 
 // all event lsiteners
 
 inputArea.addEventListener('change', inputFieldData);
 
+inputArea.addEventListener('input', function () {
+    if (inputArea.value.trim() === '') {
+        inputAddLeft.disabled = true;
+        inputAddRight.disabled = true;
+    } else {
+        inputAddLeft.disabled = false;
+        inputAddRight.disabled = false;
+    }
+});
+
 inputAddLeft.addEventListener('click', () => {
-    creatingDivAndAddingToObject(leftContainer);
+    creatingDivAndAddingToObject(leftContainer, leftContainerData);
 });
 
 inputAddRight.addEventListener('click', () => {
-    creatingDivAndAddingToObject(rightContainer);
+    creatingDivAndAddingToObject(rightContainer, rightContainerData);
 });
 
 
+document.addEventListener('change', checkboxCheckOrNot)
+
+
+
+moveLeftToRight.addEventListener('click', movingLeftToRight)
+moveRightToLeft.addEventListener('click', movingRightToLeft)
